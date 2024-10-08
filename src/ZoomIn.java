@@ -1,5 +1,3 @@
-
-
 import processing.core.PApplet;
 
 public class ZoomIn extends Button {
@@ -10,7 +8,9 @@ public class ZoomIn extends Button {
     
     @Override
     protected void clicked() {
-        App.gridX--;
-        App.gridY--;
+        if (App.gridX > 1) {
+            App.gridX--;
+            App.gridY--;
+        }
     }
 }

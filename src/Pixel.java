@@ -17,16 +17,24 @@ public class Pixel {
         return pixelX;
     }
 
+    public void x(float x) {
+        this.pixelX = x;
+    }
+
     public float y() {
         return pixelY;
+    }
+
+    public void y(float y) {
+        this.pixelY = y;
     }
 
     public float sizeX() {
         return sizeX;
     }
 
-    public float sizeX(float size) {
-        return size;
+    public void sizeX(float size) {
+        this.sizeX = size;
     }
 
     public int gridX() {
@@ -41,8 +49,8 @@ public class Pixel {
         return sizeY;
     }
     
-    public float sizeY(float size) {
-        return size;
+    public void sizeY(float size) {
+        this.sizeY = size;
     }
 
     public Pixel(float x, float y, float sizeX, float sizeY, int gridX, int gridY, int r, int g, int b, PApplet applet) {

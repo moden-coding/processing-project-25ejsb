@@ -13,18 +13,19 @@ public class App extends PApplet {
     private int windowWidth = 1200;
     private int windowHeight = 800;
 
-    public static int gridX = 10;
-    public static int gridY = 10;
+    public static int gridX = 25;
+    public static int gridY = 25;
     
-    private double pixelSizeX;
-    private double pixelSizeY;
+    private float pixelSizeX;
+    private float pixelSizeY;
 
     private ArrayList<Pixel> pixels = new ArrayList<>();
     private ArrayList<TextBox> textboxes = new ArrayList<>();
     private ArrayList<Button> buttons = new ArrayList<>();
 
-    private TextBox color = new TextBox(0, 0, 150, 40, this);
-    private ZoomIn zoomIn = new ZoomIn(50, 50, 100, 0, 255, 255, 255, "z", this);
+    private TextBox color = new TextBox(0, 50, 150, 40, this);
+    private ZoomIn zoomIn = new ZoomIn(50, 50, 1, 200, 70, 116, 224, "🔎", this);
+    private ZoomOut zoomOut = new ZoomOut(50, 50, 75, 200, 70, 116, 224, "🔍", this);
 
     public int width() {
         return windowWidth;
@@ -38,41 +39,59 @@ public class App extends PApplet {
         pixelSizeX = (float) windowWidth/gridX;
         pixelSizeY = (float) windowHeight/gridY;
         for (Pixel pixel: pixels) {
-            pixel.sizeX((float) pixelSizeX);
-            pixel.sizeY((float) pixelSizeY);
+            pixel.sizeX(pixelSizeX);
+            pixel.sizeY(pixelSizeY);
+            pixel.x(((float) ((pixelSizeX*pixel.gridX())-pixelSizeX)));
+            pixel.y(((float) ((pixelSizeY*pixel.gridY())-pixelSizeY)));
         }
     }
 
     private void updateGrid() {
         for (int y = 1; y <= gridY; y++) {
             for (int i = 1; i <= gridX; i++) {
-                boolean found = false;
+                ArrayList<Pixel> working = new ArrayList<>();
                 for (Pixel pixel: pixels) {
-                    if (i != pixel.gridX() && y != pixel.gridY()) {
-                        found = true;
+                    if (pixel.gridX() == i && pixel.gridY() == y) {
+                        working.add(pixel);
                     }
                 }
-                if (!found) {
-                    System.out.println("Yes");
-                    Pixel pixel = new Pixel(((float) ((pixelSizeX*i)-pixelSizeX)), ((float) ((pixelSizeY*y)-pixelSizeY)), (float)pixelSizeX, (float)pixelSizeY, i, y, 255, 255, 255, this);
+                if (working.size() == 0) {
+                    Pixel pixel = new Pixel(((float) ((pixelSizeX*i)-pixelSizeX)), ((float) ((pixelSizeY*y)-pixelSizeY)), (float) pixelSizeX, (float) pixelSizeY, i, y, 255, 255, 255, this);
                     pixels.add(pixel);
                 }
             }
         }
     }
 
+    public void drawPixel(Pixel pixel) {
+        if (mouseX >= pixel.x() && mouseY >= pixel.y() && mouseX <= pixel.x()+pixel.sizeX() && mouseY <= pixel.y()+pixel.sizeY()) {
+            if (inputText.length() > 0 && inputText.split(",").length >= 3) {
+                pixel.r = Integer.valueOf(inputText.split(",")[0]);
+                pixel.g = Integer.valueOf(inputText.split(",")[1]);
+                pixel.b = Integer.valueOf(inputText.split(",")[2]);
+            } else {
+                pixel.r = 255;
+                pixel.g = 0;
+                pixel.b = 0;
+            }
+        }
+    }
+
     public void setup(){
         buttons.add(zoomIn);
+        buttons.add(zoomOut);
         textboxes.add(color);
         background(200);
         updateGridSize();
         for (int y = 1; y <= gridY; y++) {
             for (int i = 1; i <= gridX; i++) {
-                Pixel pixel = new Pixel(((float) ((pixelSizeX*i)-pixelSizeX)), ((float) ((pixelSizeY*y)-pixelSizeY)), (float)pixelSizeX, (float)pixelSizeY, i, y, 255, 255, 255, this);
+                Pixel pixel = new Pixel(((float) ((pixelSizeX*i)-pixelSizeX)), ((float) ((pixelSizeY*y)-pixelSizeY)), pixelSizeX, pixelSizeY, i, y, 255, 255, 255, this);
                 pixels.add(pixel);
             }
         }
-        textSize(16);
+        PFont f = createFont("AppleSDGothicNeo-ExtraBold",16,true);
+        textFont(f,16);
+        frameRate(240);
     }
 
     public void settings() {
@@ -83,7 +102,9 @@ public class App extends PApplet {
         updateGridSize();
         updateGrid();
         for (Pixel pixel: pixels) {
-            pixel.drawPixel();
+            if (pixel.gridX() <= gridX && pixel.gridY() <= gridY) {
+                pixel.drawPixel();
+            }
         }
         for (TextBox textBox: textboxes) {
             textBox.drawTextBox();
@@ -97,43 +118,34 @@ public class App extends PApplet {
     public void mouseDragged() {
         if (!isFocused) {
             for (Pixel pixel: pixels) {
-                if (mouseX >= pixel.x() && mouseY >= pixel.y() && mouseX <= pixel.x()+pixel.sizeX() && mouseY <= pixel.y()+pixel.sizeY()) {
-                    if (inputText.length() > 0 && inputText.split(",").length >= 3) {
-                        pixel.r = Integer.valueOf(inputText.split(",")[0]);
-                        pixel.g = Integer.valueOf(inputText.split(",")[1]);
-                        pixel.b = Integer.valueOf(inputText.split(",")[2]);
-                    } else {
-                        pixel.r = 255;
-                        pixel.g = 0;
-                        pixel.b = 0;
-                    }
-                }
+                drawPixel(pixel);
             }
         }
     }
 
     @Override
     public void mousePressed() {
+        boolean successfulInput = false;   
+        // textboxes
         for (TextBox textBox: textboxes) {
             if (textBox.checkIfClicked()) {
                 isFocused = true;  // Focus the text box
                 textBoxFocused = textBox;
+                successfulInput = true;
             } else {
                 isFocused = false;  // Unfocus if clicked outside
                 textBoxFocused = null;
-                for (Pixel pixel: pixels) {
-                    if (mouseX >= pixel.x() && mouseY >= pixel.y() && mouseX <= pixel.x()+pixel.sizeX() && mouseY <= pixel.y()+pixel.sizeY()) {
-                        if (inputText.length() > 0 && inputText.split(",").length >= 3) {
-                            pixel.r = Integer.valueOf(inputText.split(",")[0]);
-                            pixel.g = Integer.valueOf(inputText.split(",")[1]);
-                            pixel.b = Integer.valueOf(inputText.split(",")[2]);
-                        } else {
-                            pixel.r = 255;
-                            pixel.g = 0;
-                            pixel.b = 0;
-                        }
-                    }
-                }
+            }
+        }
+        for (Button button: buttons) {
+            if (button.mouseClicked()) {
+                System.out.println(button + " Click successfully worked!");
+                successfulInput = true;
+            }
+        }
+        if (!successfulInput) {
+            for (Pixel pixel: pixels) {
+                drawPixel(pixel);
             }
         }
     }

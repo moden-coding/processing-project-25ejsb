@@ -30,7 +30,7 @@ public class TextBox {
                 
         // Display the entered text inside the text box
         applet.fill(0);  // Black text
-        applet.text(App.inputText, applet.CENTER, (sizeY/2)+applet.CENTER);  // Adjust x and y for the text position
+        applet.text(App.inputText, applet.CENTER, ((y+(sizeY/2))+applet.CENTER));  // Adjust x and y for the text position
     }
 
     public boolean checkIfClicked() {

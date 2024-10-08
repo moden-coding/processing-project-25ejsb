@@ -1,4 +1,3 @@
-
 import processing.core.PApplet;
 
 public class Button {
@@ -25,10 +24,12 @@ public class Button {
         this.applet = applet;
     }
 
-    public void mouseClicked() {
+    public boolean mouseClicked() {
         if (applet.mouseX >= posX && applet.mouseX <= posX+sizeX && applet.mouseY >= posY && applet.mouseY <= posY+sizeY) {
             clicked();
+            return true;
         }
+        return false;
     }
 
     protected void clicked() {
@@ -40,6 +41,6 @@ public class Button {
         applet.rect(posX, posY, sizeX, sizeY);
 
         applet.fill(0);
-        applet.text(text, applet.CENTER, (sizeY/2)+applet.CENTER);
+        applet.text(text, posX+(sizeX/applet.CENTER), ((posY+(sizeY/2))+applet.CENTER));
     }
 }
