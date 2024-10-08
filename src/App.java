@@ -66,9 +66,15 @@ public class App extends PApplet {
     public void drawPixel(Pixel pixel) {
         if (mouseX >= pixel.x() && mouseY >= pixel.y() && mouseX <= pixel.x()+pixel.sizeX() && mouseY <= pixel.y()+pixel.sizeY()) {
             if (inputText.length() > 0 && inputText.split(",").length >= 3) {
-                pixel.r = Integer.valueOf(inputText.split(",")[0]);
-                pixel.g = Integer.valueOf(inputText.split(",")[1]);
-                pixel.b = Integer.valueOf(inputText.split(",")[2]);
+                try {
+                    pixel.r = Integer.valueOf(inputText.split(",")[0].strip());
+                    pixel.g = Integer.valueOf(inputText.split(",")[1].strip());
+                    pixel.b = Integer.valueOf(inputText.split(",")[2].strip());
+                } catch (Exception e) {
+                   pixel.r = 0;
+                   pixel.b = 0;
+                   pixel.g = 0; 
+                }
             } else {
                 pixel.r = 255;
                 pixel.g = 0;
@@ -112,6 +118,11 @@ public class App extends PApplet {
         for (Button button: buttons) {
             button.drawButton();
         }
+
+        textSize(32);
+        text("Color (R,G,B):", 1, 40);
+        text("Zoom", 20, 170);
+        textSize(16);
     }
 
     @Override
