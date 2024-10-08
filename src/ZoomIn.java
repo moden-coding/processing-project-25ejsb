@@ -1,7 +1,5 @@
-package net.eitan.buttons;
 
-import net.eitan.App;
-import net.eitan.Button;
+
 import processing.core.PApplet;
 
 public class ZoomIn extends Button {
@@ -12,7 +10,7 @@ public class ZoomIn extends Button {
     
     @Override
     protected void clicked() {
-        App.gridX -= 1;
-        App.gridY -= 1;
+        App.gridX--;
+        App.gridY--;
     }
 }

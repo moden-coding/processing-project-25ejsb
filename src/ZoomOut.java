@@ -1,7 +1,3 @@
-package net.eitan.buttons;
-
-import net.eitan.App;
-import net.eitan.Button;
 import processing.core.PApplet;
 
 public class ZoomOut extends Button {
@@ -12,7 +8,7 @@ public class ZoomOut extends Button {
     
     @Override
     protected void clicked() {
-        App.gridX += 1;
-        App.gridY += 1;
+        App.gridX++;
+        App.gridY++;
     }
 }

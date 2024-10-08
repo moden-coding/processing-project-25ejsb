@@ -1,9 +1,8 @@
-package net.eitan;
 import processing.core.*;
 import java.util.*;
 
-public class App extends PApplet{
-    public static void main(String[] args)  {
+public class App extends PApplet {
+    public static void main(String[] args) {
         PApplet.main("App");
     }
 
@@ -22,8 +21,10 @@ public class App extends PApplet{
 
     private ArrayList<Pixel> pixels = new ArrayList<>();
     private ArrayList<TextBox> textboxes = new ArrayList<>();
+    private ArrayList<Button> buttons = new ArrayList<>();
 
     private TextBox color = new TextBox(0, 0, 150, 40, this);
+    private ZoomIn zoomIn = new ZoomIn(50, 50, 100, 0, 255, 255, 255, "z", this);
 
     public int width() {
         return windowWidth;
@@ -61,6 +62,7 @@ public class App extends PApplet{
     }
 
     public void setup(){
+        buttons.add(zoomIn);
         textboxes.add(color);
         background(200);
         updateGridSize();
@@ -85,6 +87,9 @@ public class App extends PApplet{
         }
         for (TextBox textBox: textboxes) {
             textBox.drawTextBox();
+        }
+        for (Button button: buttons) {
+            button.drawButton();
         }
     }
 

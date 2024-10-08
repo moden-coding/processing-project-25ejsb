@@ -1,4 +1,4 @@
-package net.eitan;
+
 import processing.core.PApplet;
 
 public class Button {
@@ -7,11 +7,11 @@ public class Button {
     private float sizeY;
     private float posX;
     private float posY;
-    private PApplet applet;
     public int r;
     public int g;
     public int b;
     private String text;
+    private PApplet applet;
 
     public Button(float sizeX, float sizeY, int posX, int posY, int r, int g, int b, String text, PApplet applet) {
         this.sizeX = sizeX;

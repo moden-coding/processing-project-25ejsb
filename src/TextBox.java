@@ -1,4 +1,3 @@
-package net.eitan;
 import processing.core.PApplet;
 
 public class TextBox {
