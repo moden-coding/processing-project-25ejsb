@@ -1,4 +1,7 @@
 import processing.core.*;
+import processing.event.MouseEvent;
+
+import java.io.*;
 import java.util.*;
 
 public class App extends PApplet {
@@ -30,6 +33,8 @@ public class App extends PApplet {
     private TextBox color = new TextBox(0, 50, 150, 40, this);
     private ZoomIn zoomIn = new ZoomIn(50, 50, 1, 200, 70, 116, 224, "🔎", this);
     private ZoomOut zoomOut = new ZoomOut(50, 50, 75, 200, 70, 116, 224, "🔍", this);
+
+    private Pixel hoveredPixel;
 
     public int width() {
         return windowWidth;
@@ -101,16 +106,26 @@ public class App extends PApplet {
         textboxes.add(color);
         background(backgroundr, backgroundg, backgroundb);
         updateGridSize();
-        for (int y = 1; y <= gridY; y++) {
-            for (int i = 1; i <= gridX; i++) {
-                Pixel pixel = new Pixel(((float) ((pixelSizeX*i)-pixelSizeX)), ((float) ((pixelSizeY*y)-pixelSizeY)), pixelSizeX, pixelSizeY, i, y, backgroundr, backgroundb, backgroundg, this);
+        try {
+            File file = new File("save.draw");
+            Scanner reader = new Scanner(file);
+            while (reader.hasNextLine()) {
+                String[] data = reader.nextLine().split(", ");
+                Pixel pixel = new Pixel(Float.valueOf(data[0]), Float.valueOf(data[1]), Float.valueOf(data[2]), Float.valueOf(data[3]), Integer.valueOf(data[7]), Integer.valueOf(data[8]), Integer.valueOf(data[4]), Integer.valueOf(data[5]), Integer.valueOf(data[6]), this);
                 pixels.add(pixel);
             }
-        }
+        } catch (FileNotFoundException e) {
+            for (int y = 1; y <= gridY; y++) {
+                for (int i = 1; i <= gridX; i++) {
+                    Pixel pixel = new Pixel(((float) ((pixelSizeX*i)-pixelSizeX)), ((float) ((pixelSizeY*y)-pixelSizeY)), pixelSizeX, pixelSizeY, i, y, backgroundr, backgroundb, backgroundg, this);
+                    pixels.add(pixel);
+                }
+            }
+        }  
         PFont f = createFont("AppleSDGothicNeo-ExtraBold",16,true);
         textFont(f,16);
         frameRate(240);
-        surface.setTitle("Drawing App!");
+        surface.setTitle("Drawing App!");   
     }
 
     public void settings() {
@@ -121,6 +136,9 @@ public class App extends PApplet {
         updateGridSize();
         updateGrid();
         for (Pixel pixel: pixels) {
+            if (mouseX >= pixel.x() && mouseY >= pixel.y() && mouseX <= pixel.x()+pixel.sizeX() && mouseY <= pixel.y()+pixel.sizeY()) {
+                hoveredPixel = pixel;
+            }
             if (pixel.gridX() <= gridX && pixel.gridY() <= gridY) {
                 pixel.drawPixel();
             }
@@ -187,6 +205,35 @@ public class App extends PApplet {
     public void keyTyped() {
         if (textBoxFocused != null) {
             textBoxFocused.type();
+        }
+    }
+
+    @Override
+    public void mouseWheel(MouseEvent event) {
+        if (event.getCount() > 0 && gridX <= 70) {
+            gridX++;
+            gridY++;
+        }
+        if (event.getCount() < 0 && gridX > 1) {
+            gridX--;
+            gridY--;
+        }
+    }
+
+    @Override
+    public void exit() {
+        try {
+            FileWriter fileWriter = new FileWriter("save.draw");
+            String writerText = "";
+            for (Pixel pixel: pixels) {
+                writerText += pixel.x() + ", " + pixel.y() + ", " + pixel.sizeX() + ", " + pixel.sizeY() + ", " + pixel.r + ", " + pixel.g + ", " + pixel.b + ", " + pixel.gridX() + ", " + pixel.gridY() + "\n";
+            }
+            fileWriter.write(writerText);
+            fileWriter.close();
+            System.out.println("Wrote the file!");
+        } catch (IOException e) {
+            System.out.println("An error occured");
+            e.printStackTrace();
         }
     }
 }
