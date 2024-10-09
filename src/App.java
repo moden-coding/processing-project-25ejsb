@@ -15,6 +15,10 @@ public class App extends PApplet {
 
     public static int gridX = 25;
     public static int gridY = 25;
+
+    public static int backgroundr = 255;
+    public static int backgroundg = 255;
+    public static int backgroundb = 255;
     
     private float pixelSizeX;
     private float pixelSizeY;
@@ -56,7 +60,7 @@ public class App extends PApplet {
                     }
                 }
                 if (working.size() == 0) {
-                    Pixel pixel = new Pixel(((float) ((pixelSizeX*i)-pixelSizeX)), ((float) ((pixelSizeY*y)-pixelSizeY)), (float) pixelSizeX, (float) pixelSizeY, i, y, 255, 255, 255, this);
+                    Pixel pixel = new Pixel(((float) ((pixelSizeX*i)-pixelSizeX)), ((float) ((pixelSizeY*y)-pixelSizeY)), (float) pixelSizeX, (float) pixelSizeY, i, y, backgroundr, backgroundg, backgroundb, this);
                     pixels.add(pixel);
                 }
             }
@@ -83,21 +87,30 @@ public class App extends PApplet {
         }
     }
 
+    public void resetPixel(Pixel pixel) {
+        if (mouseX >= pixel.x() && mouseY >= pixel.y() && mouseX <= pixel.x()+pixel.sizeX() && mouseY <= pixel.y()+pixel.sizeY()) {
+            pixel.r = backgroundr;
+            pixel.g = backgroundg;
+            pixel.b = backgroundb;
+        }
+    }
+
     public void setup(){
         buttons.add(zoomIn);
         buttons.add(zoomOut);
         textboxes.add(color);
-        background(200);
+        background(backgroundr, backgroundg, backgroundb);
         updateGridSize();
         for (int y = 1; y <= gridY; y++) {
             for (int i = 1; i <= gridX; i++) {
-                Pixel pixel = new Pixel(((float) ((pixelSizeX*i)-pixelSizeX)), ((float) ((pixelSizeY*y)-pixelSizeY)), pixelSizeX, pixelSizeY, i, y, 255, 255, 255, this);
+                Pixel pixel = new Pixel(((float) ((pixelSizeX*i)-pixelSizeX)), ((float) ((pixelSizeY*y)-pixelSizeY)), pixelSizeX, pixelSizeY, i, y, backgroundr, backgroundb, backgroundg, this);
                 pixels.add(pixel);
             }
         }
         PFont f = createFont("AppleSDGothicNeo-ExtraBold",16,true);
         textFont(f,16);
         frameRate(240);
+        surface.setTitle("Drawing App!");
     }
 
     public void settings() {
@@ -129,7 +142,11 @@ public class App extends PApplet {
     public void mouseDragged() {
         if (!isFocused) {
             for (Pixel pixel: pixels) {
-                drawPixel(pixel);
+                if (mouseButton == RIGHT) {
+                    resetPixel(pixel);
+                } else {
+                    drawPixel(pixel);
+                }
             }
         }
     }
@@ -156,7 +173,12 @@ public class App extends PApplet {
         }
         if (!successfulInput) {
             for (Pixel pixel: pixels) {
-                drawPixel(pixel);
+                if (mouseButton == RIGHT) {
+                    resetPixel(pixel);
+                } else {
+                    drawPixel(pixel);
+                }
+
             }
         }
     }

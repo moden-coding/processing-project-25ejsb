@@ -8,7 +8,7 @@ public class ZoomOut extends Button {
     
     @Override
     protected void clicked() {
-        if (App.gridX <= 45) {
+        if (App.gridX <= 70) {
             App.gridX++;
             App.gridY++;
         }
