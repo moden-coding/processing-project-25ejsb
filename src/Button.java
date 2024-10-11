@@ -38,6 +38,7 @@ public class Button {
 
     public void drawButton() {
         applet.fill(r, g, b);
+        applet.stroke(r, g, b);
         applet.rect(posX, posY, sizeX, sizeY);
 
         applet.fill(0);

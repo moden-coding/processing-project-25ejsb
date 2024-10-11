@@ -36,12 +36,34 @@ public class App extends PApplet {
 
     private Pixel hoveredPixel;
 
+    private ArrayList<Action> undo = new ArrayList<>();
+
+    private ArrayList<Action> actions = new ArrayList<>();
+
     public int width() {
         return windowWidth;
     }
 
     public int height() {
         return windowHeight;
+    }
+
+    private void undo() {
+        if (actions.size() > 0) {
+            Action action = actions.get(actions.size()-1);
+            undo.add(action);
+            action.revertAction();
+            actions.remove(action);
+        }
+    }
+
+    private void redo() {
+        if (undo.size() > 0) {
+            Action action = undo.get(undo.size()-1);
+            actions.add(action);
+            action.undoAction();
+            undo.remove(action);
+        }
     }
 
     private void updateGridSize() {
@@ -76,15 +98,28 @@ public class App extends PApplet {
         if (mouseX >= pixel.x() && mouseY >= pixel.y() && mouseX <= pixel.x()+pixel.sizeX() && mouseY <= pixel.y()+pixel.sizeY()) {
             if (inputText.length() > 0 && inputText.split(",").length >= 3) {
                 try {
-                    pixel.r = Integer.valueOf(inputText.split(",")[0].strip());
-                    pixel.g = Integer.valueOf(inputText.split(",")[1].strip());
-                    pixel.b = Integer.valueOf(inputText.split(",")[2].strip());
+                    int newR = Integer.valueOf(inputText.split(",")[0].strip());
+                    int newG = Integer.valueOf(inputText.split(",")[1].strip());
+                    int newB = Integer.valueOf(inputText.split(",")[2].strip());
+                    if (!(newR == pixel.r && newG == pixel.g && newB == pixel.b)) {
+                        Action action = new Action(pixel.r, pixel.g, pixel.b, newR, newB, newG, pixel, this);
+                        actions.add(action);
+                        pixel.r = newR;
+                        pixel.g = newG;
+                        pixel.b = newB;      
+                    }
                 } catch (Exception e) {
+                   // Action action = new Action(pixel.r, pixel.g, pixel.b, pixel, this);
+                   // actions.add(action);
+                   Action action = new Action(pixel.r, pixel.g, pixel.b, 0, 0, 0, pixel, this);
+                   actions.add(action);
                    pixel.r = 0;
                    pixel.b = 0;
-                   pixel.g = 0; 
+                   pixel.g = 0;
                 }
             } else {
+                Action action = new Action(pixel.r, pixel.g, pixel.b, 255, 0, 0, pixel, this);
+                actions.add(action);
                 pixel.r = 255;
                 pixel.g = 0;
                 pixel.b = 0;
@@ -94,6 +129,8 @@ public class App extends PApplet {
 
     public void resetPixel(Pixel pixel) {
         if (mouseX >= pixel.x() && mouseY >= pixel.y() && mouseX <= pixel.x()+pixel.sizeX() && mouseY <= pixel.y()+pixel.sizeY()) {
+            Action action = new Action(pixel.r, pixel.g, pixel.b, backgroundr, backgroundb, backgroundg, pixel, this);
+            actions.add(action);
             pixel.r = backgroundr;
             pixel.g = backgroundg;
             pixel.b = backgroundb;
@@ -114,6 +151,7 @@ public class App extends PApplet {
                 Pixel pixel = new Pixel(Float.valueOf(data[0]), Float.valueOf(data[1]), Float.valueOf(data[2]), Float.valueOf(data[3]), Integer.valueOf(data[7]), Integer.valueOf(data[8]), Integer.valueOf(data[4]), Integer.valueOf(data[5]), Integer.valueOf(data[6]), this);
                 pixels.add(pixel);
             }
+            reader.close();
         } catch (FileNotFoundException e) {
             for (int y = 1; y <= gridY; y++) {
                 for (int i = 1; i <= gridX; i++) {
@@ -203,6 +241,14 @@ public class App extends PApplet {
 
     @Override
     public void keyTyped() {
+        if (key == 'c') {
+            undo();
+        }
+    
+        if (key == 'v') {
+            redo();
+        }
+
         if (textBoxFocused != null) {
             textBoxFocused.type();
         }
