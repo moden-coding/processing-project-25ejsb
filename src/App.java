@@ -3,6 +3,11 @@ import processing.event.MouseEvent;
 
 import java.io.*;
 import java.util.*;
+import java.awt.AWTException;
+import java.awt.Rectangle;
+import java.awt.Robot;
+import java.awt.Toolkit;
+import java.awt.image.*;
 
 public class App extends PApplet {
     public static void main(String[] args) {
@@ -37,7 +42,12 @@ public class App extends PApplet {
     private Undo undoBtn = new Undo(50, 50, 1, 350, 70, 116, 224, "↩️", this);
     private Redo redoBtn = new Redo(50, 50, 75, 350, 70, 116, 224, "↪️", this);
 
+    private Screenshot screenshot = new Screenshot(50, 50, 1, 450, 70, 116, 224, "📸", this);
+
     private Pixel hoveredPixel;
+
+    PImage screenShot;
+    public static boolean takingScreenshot = false;
 
     private static ArrayList<Action> undo = new ArrayList<>();
 
@@ -68,6 +78,22 @@ public class App extends PApplet {
             undo.remove(action);
         }
     }
+
+    // void takeScreenShot() {
+    //     Rectangle screenRect = new Rectangle( Toolkit.getDefaultToolkit().getScreenSize() );
+
+    //     try {
+
+    //         BufferedImage screenBuffer = new Robot().createScreenCapture( screenRect );
+
+    //         screenShot = new PImage( screenBuffer.getWidth(), screenBuffer.getHeight(), PConstants.ARGB );
+    //         screenBuffer.getRGB( 0, 0, screenShot.width, screenShot.height, screenShot.pixels, 0, screenShot.width );
+    //         screenShot.updatePixels();
+
+    //     } catch ( AWTException e ) {
+    //         e.printStackTrace();
+    //     }
+    // }
 
     private void updateGridSize() {
         pixelSizeX = (float) windowWidth/gridX;
@@ -152,6 +178,7 @@ public class App extends PApplet {
         textboxes.add(color);
         buttons.add(undoBtn);
         buttons.add(redoBtn);
+        buttons.add(screenshot);
         background(backgroundr, backgroundg, backgroundb);
         updateGridSize();
         try {
@@ -192,11 +219,18 @@ public class App extends PApplet {
                 pixel.drawPixel();
             }
         }
-        for (TextBox textBox: textboxes) {
-            textBox.drawTextBox();
+        if (!takingScreenshot) {
+            for (TextBox textBox: textboxes) {
+                textBox.drawTextBox();
+            }
+            for (Button button: buttons) {
+                button.drawButton();
+            }
         }
-        for (Button button: buttons) {
-            button.drawButton();
+
+        if (takingScreenshot) {
+            save("image.jpg");
+            takingScreenshot = false;
         }
 
         textSize(32);
