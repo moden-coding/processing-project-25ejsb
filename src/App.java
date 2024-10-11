@@ -34,11 +34,14 @@ public class App extends PApplet {
     private ZoomIn zoomIn = new ZoomIn(50, 50, 1, 200, 70, 116, 224, "🔎", this);
     private ZoomOut zoomOut = new ZoomOut(50, 50, 75, 200, 70, 116, 224, "🔍", this);
 
+    private Undo undoBtn = new Undo(50, 50, 1, 350, 70, 116, 224, "↩️", this);
+    private Redo redoBtn = new Redo(50, 50, 75, 350, 70, 116, 224, "↪️", this);
+
     private Pixel hoveredPixel;
 
-    private ArrayList<Action> undo = new ArrayList<>();
+    private static ArrayList<Action> undo = new ArrayList<>();
 
-    private ArrayList<Action> actions = new ArrayList<>();
+    private static ArrayList<Action> actions = new ArrayList<>();
 
     public int width() {
         return windowWidth;
@@ -48,7 +51,7 @@ public class App extends PApplet {
         return windowHeight;
     }
 
-    private void undo() {
+    public static void undo() {
         if (actions.size() > 0) {
             Action action = actions.get(actions.size()-1);
             undo.add(action);
@@ -57,7 +60,7 @@ public class App extends PApplet {
         }
     }
 
-    private void redo() {
+    public static void redo() {
         if (undo.size() > 0) {
             Action action = undo.get(undo.size()-1);
             actions.add(action);
@@ -111,15 +114,19 @@ public class App extends PApplet {
                 } catch (Exception e) {
                    // Action action = new Action(pixel.r, pixel.g, pixel.b, pixel, this);
                    // actions.add(action);
-                   Action action = new Action(pixel.r, pixel.g, pixel.b, 0, 0, 0, pixel, this);
-                   actions.add(action);
+                   if (!(0 == pixel.r && 0 == pixel.g && 0 == pixel.b)) {
+                    Action action = new Action(pixel.r, pixel.g, pixel.b, 0, 0, 0, pixel, this);
+                    actions.add(action);
+                   }
                    pixel.r = 0;
                    pixel.b = 0;
                    pixel.g = 0;
                 }
             } else {
-                Action action = new Action(pixel.r, pixel.g, pixel.b, 255, 0, 0, pixel, this);
-                actions.add(action);
+                if (!(255 == pixel.r && 0 == pixel.g && 0 == pixel.b)) {
+                    Action action = new Action(pixel.r, pixel.g, pixel.b, 255, 0, 0, pixel, this);
+                    actions.add(action);
+                } 
                 pixel.r = 255;
                 pixel.g = 0;
                 pixel.b = 0;
@@ -129,8 +136,10 @@ public class App extends PApplet {
 
     public void resetPixel(Pixel pixel) {
         if (mouseX >= pixel.x() && mouseY >= pixel.y() && mouseX <= pixel.x()+pixel.sizeX() && mouseY <= pixel.y()+pixel.sizeY()) {
-            Action action = new Action(pixel.r, pixel.g, pixel.b, backgroundr, backgroundb, backgroundg, pixel, this);
-            actions.add(action);
+            if (!(backgroundr == pixel.r && backgroundg == pixel.g && backgroundb == pixel.b)) {
+                Action action = new Action(pixel.r, pixel.g, pixel.b, backgroundr, backgroundb, backgroundg, pixel, this);
+                actions.add(action);
+            }
             pixel.r = backgroundr;
             pixel.g = backgroundg;
             pixel.b = backgroundb;
@@ -141,6 +150,8 @@ public class App extends PApplet {
         buttons.add(zoomIn);
         buttons.add(zoomOut);
         textboxes.add(color);
+        buttons.add(undoBtn);
+        buttons.add(redoBtn);
         background(backgroundr, backgroundg, backgroundb);
         updateGridSize();
         try {
@@ -191,6 +202,8 @@ public class App extends PApplet {
         textSize(32);
         text("Color (R,G,B):", 1, 40);
         text("Zoom", 20, 170);
+        textSize(25);
+        text("Undo & Redo", 1, 320);
         textSize(16);
     }
 
@@ -239,18 +252,18 @@ public class App extends PApplet {
         }
     }
 
+    boolean controlTyped = false;
+
     @Override
     public void keyTyped() {
-        if (key == 'c') {
-            undo();
-        }
-    
-        if (key == 'v') {
-            redo();
-        }
-
         if (textBoxFocused != null) {
             textBoxFocused.type();
+        } else {
+            if (key == 'z') {
+                undo();
+            } else if (key == 'y') {
+                redo();
+            }
         }
     }
 
@@ -281,5 +294,6 @@ public class App extends PApplet {
             System.out.println("An error occured");
             e.printStackTrace();
         }
+        System.exit(0);
     }
 }
