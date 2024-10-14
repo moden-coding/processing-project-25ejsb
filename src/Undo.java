@@ -1,5 +1,3 @@
-
-
 import processing.core.PApplet;
 
 public class Undo extends Button {

@@ -79,22 +79,6 @@ public class App extends PApplet {
         }
     }
 
-    // void takeScreenShot() {
-    //     Rectangle screenRect = new Rectangle( Toolkit.getDefaultToolkit().getScreenSize() );
-
-    //     try {
-
-    //         BufferedImage screenBuffer = new Robot().createScreenCapture( screenRect );
-
-    //         screenShot = new PImage( screenBuffer.getWidth(), screenBuffer.getHeight(), PConstants.ARGB );
-    //         screenBuffer.getRGB( 0, 0, screenShot.width, screenShot.height, screenShot.pixels, 0, screenShot.width );
-    //         screenShot.updatePixels();
-
-    //     } catch ( AWTException e ) {
-    //         e.printStackTrace();
-    //     }
-    // }
-
     private void updateGridSize() {
         pixelSizeX = (float) windowWidth/gridX;
         pixelSizeY = (float) windowHeight/gridY;
